@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'pages/settingsMenu.dart';
 
 void main() {
   runApp(MyApp());
@@ -81,7 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
           Padding(
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+                },
                 child: Icon(
                   Icons.settings,
                   size: 26.0,
