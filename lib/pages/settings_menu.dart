@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:dynamic_theme/dynamic_theme.dart';
+
 
 class Settings extends StatefulWidget {
   Settings({Key key, this.title}) : super(key: key);
@@ -19,27 +21,31 @@ class SettingsState extends State<Settings>{
         appBar: AppBar(
           title: Text("Einstellungen"),
         ),
-
-        body: Center(
+        body: Container(
           child: Switch(
             value: isSwitched,
             onChanged: (value) {
               setState(() {
                 isSwitched = value;
                 print(isSwitched);
+                if(value==true){
+                  changeBrightness();
+                }
+                if(value==false){
+                  changeBrightness();
+                }
               });
             },
-            activeTrackColor: Colors.lightGreenAccent,
-            activeColor: Colors.green,
+            activeTrackColor: Colors.black12,
+            activeColor: Colors.black,
           ),
         )
-      //child: FlatButton(
-      // onPressed: () {
-      // Navigator.pop(context);
-      // },
-      // child: Text('Zurück'),
-      //),
-      //),
     );
+  }
+  void changeBrightness() {
+    DynamicTheme.of(context).setBrightness(
+        Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark);
   }
 }
