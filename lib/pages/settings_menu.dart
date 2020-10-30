@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:dynamic_theme/dynamic_theme.dart';
 
+bool prev= false;
 
 class Settings extends StatefulWidget {
   Settings({Key key, this.title}) : super(key: key);
@@ -32,11 +32,11 @@ class MyStatefulWidget extends StatefulWidget {
   MyStatefulWidget({Key key}) : super(key: key);
 
   @override
-  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+  _DarkMode createState() => _DarkMode();
 }
 
-class _MyStatefulWidgetState extends State<MyStatefulWidget> {
-  bool isSwitched = false;
+class _DarkMode extends State<MyStatefulWidget> {
+  bool isSwitched = prev;
 
   @override
   Widget build(BuildContext context) {
@@ -46,12 +46,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       onChanged: (bool value) {
         setState(() {
           isSwitched = value;
-          if(isSwitched==true){
-            changeBrightness();
-          }
-          if(isSwitched==false){
-            changeBrightness();
-          }
+          changeBrightness();
+          prev=value;
         });
       },
       activeTrackColor: Colors.lightBlueAccent,
