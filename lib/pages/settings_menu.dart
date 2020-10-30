@@ -13,7 +13,6 @@ class Settings extends StatefulWidget {
 
 class SettingsState extends State<Settings>{
 
-  bool isSwitched = false;
 
   @override
   Widget build(BuildContext context) {
@@ -22,24 +21,42 @@ class SettingsState extends State<Settings>{
           title: Text("Einstellungen"),
         ),
         body: Container(
-          child: Switch(
-            value: isSwitched,
-            onChanged: (value) {
-              setState(() {
-                isSwitched = value;
-                print(isSwitched);
-                if(value==true){
-                  changeBrightness();
-                }
-                if(value==false){
-                  changeBrightness();
-                }
-              });
-            },
-            activeTrackColor: Colors.black12,
-            activeColor: Colors.black,
-          ),
+          child: MyStatefulWidget(),
         )
+    );
+  }
+
+}
+
+class MyStatefulWidget extends StatefulWidget {
+  MyStatefulWidget({Key key}) : super(key: key);
+
+  @override
+  _MyStatefulWidgetState createState() => _MyStatefulWidgetState();
+}
+
+class _MyStatefulWidgetState extends State<MyStatefulWidget> {
+  bool isSwitched = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      title: const Text('Dark Mode'),
+      value: isSwitched,
+      onChanged: (bool value) {
+        setState(() {
+          isSwitched = value;
+          if(isSwitched==true){
+            changeBrightness();
+          }
+          if(isSwitched==false){
+            changeBrightness();
+          }
+        });
+      },
+      activeTrackColor: Colors.lightBlueAccent,
+      activeColor: Colors.lightBlue,
+      secondary: const Icon(Icons.lightbulb_outline),
     );
   }
   void changeBrightness() {
