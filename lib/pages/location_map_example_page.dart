@@ -1,3 +1,4 @@
+import 'package:corona_diary/api/address.dart';
 import 'package:corona_diary/api/gps.dart';
 import 'package:corona_diary/api/map.dart';
 import 'package:corona_diary/api/poi.dart';
@@ -35,7 +36,6 @@ class _ExamplePageState extends State<ExamplePage> {
         builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
           if (!snapshot.hasData)
             return Center(child: CircularProgressIndicator());
-
           final locationData = snapshot.data;
           return Column(
             children: [
@@ -45,9 +45,11 @@ class _ExamplePageState extends State<ExamplePage> {
                 width: 250.0,
                 height: 250.0,
               ),
+              SizedBox(height: 10),
               Container(
                   child: Text(
                       "${locationData.latitude}, ${locationData.longitude}")),
+              SizedBox(height: 10),
               Container(
                 child: FutureBuilder<List<POI>>(
                   future: getPOIsNearBy(
@@ -58,7 +60,18 @@ class _ExamplePageState extends State<ExamplePage> {
                     return Text(snapshot.data.join("\n"));
                   },
                 ),
-              )
+              ),
+              SizedBox(height: 10),
+              Container(
+                  child: FutureBuilder<Address>(
+                future: getAddressOfLocation(
+                    locationData.latitude, locationData.longitude),
+                builder:
+                    (BuildContext context, AsyncSnapshot<Address> snapshot) {
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  return Text(snapshot.data.toString());
+                },
+              ))
             ],
           );
         },
