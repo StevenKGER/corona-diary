@@ -87,7 +87,7 @@ void removeEntryById(int id) async {
       .where((element) => element.id != id)
       .forEach((element) => tempList.add(element));
   entries.highestId -= 1;
-  for (int i = id - 1; i < entries.highestId; i++) {
+  for (int i = id; i < entries.highestId; i++) {
     final tempEntry = tempList[i];
     tempEntry.id = i;
     tempList[i] = tempEntry;
