@@ -14,7 +14,8 @@ class Address {
   Address(this.street, this.houseNumber, this.postCode, this.city, this.subUrb,
       this.borough, this.country, this.latitude, this.longitude);
 
-  factory Address.fromMap(Map<String, dynamic> map, double lat, double lon) {
+  factory Address.fromNominatimPlace(
+      Map<String, dynamic> map, double lat, double lon) {
     return Address(
         map["road"] as String ?? "",
         map["house_number"] as String ?? "",
@@ -47,5 +48,20 @@ Future<Address> getAddressOfLocation(double lat, double lon) async {
   Place place = await Nominatim.reverseSearch(
       lat: lat, lon: lon, addressDetails: true, zoom: 2);
 
-  return Address.fromMap(place.address, place.lat, place.lon);
+  return Address.fromNominatimPlace(place.address, place.lat, place.lon);
+}
+
+Future<List<Address>> searchAddress(
+    String street, String postCode, String city) async {
+  List<Address> addresses = List<Address>();
+
+  final places = await Nominatim.searchByName(
+      street: street, postalCode: postCode, city: city);
+
+  for (var place in places) {
+    addresses
+        .add(Address.fromNominatimPlace(place.address, place.lat, place.lon));
+  }
+
+  return addresses;
 }
