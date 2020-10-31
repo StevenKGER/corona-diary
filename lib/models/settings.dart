@@ -3,7 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'settings.g.dart';
 
-final defaultDarkMode = true;
+final defaultDarkMode = false;
 final defaultDaysUntilRemoval = 14;
 
 @JsonSerializable()
