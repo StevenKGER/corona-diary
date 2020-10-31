@@ -38,7 +38,7 @@ class POI {
 
   @override
   String toString() {
-    var addressArray = {
+    final addressArray = {
       this.name,
       "${this.street} ${this.houseNumber}",
       "${this.postCode} ${this.city}",
@@ -52,7 +52,7 @@ class POI {
   }
 
   String toShortAddressString() {
-    var addressArray = {
+    final addressArray = {
       "${this.street} ${this.houseNumber}",
       "${this.postCode} ${this.city}",
       this.subUrb
@@ -64,7 +64,7 @@ class POI {
   }
 }
 
-var url = "https://overpass-api.de/api/interpreter";
+final url = "https://overpass-api.de/api/interpreter";
 
 final query = ''
     '[out:json][timeout:25];'
@@ -84,12 +84,12 @@ Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
 
   if (response == null || response.statusCode != 200) return null;
 
-  final Map<POI, int> points = LinkedHashMap();
-
   final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
 
+  final Map<POI, int> points = LinkedHashMap();
+
   for (var element in jsonResponse["elements"]) {
-    POI poi = POI.fromOverPassJson(element);
+    final poi = POI.fromOverPassJson(element);
     points[poi] = new Distance()
         .distance(position, new LatLng(poi.latitude, poi.longitude)) // meters
         .toInt();

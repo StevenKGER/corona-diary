@@ -4,7 +4,7 @@ import 'package:latlong/latlong.dart';
 import 'package:location/location.dart';
 
 LocationData _oldLocation;
-int timeOfNotification = DateTime.now().millisecondsSinceEpoch;
+int _timeOfNotification = DateTime.now().millisecondsSinceEpoch;
 
 void startListener() {
   location.onLocationChanged.listen((LocationData currentLocation) {
@@ -13,7 +13,7 @@ void startListener() {
       return;
     }
 
-    if (currentLocation.time - timeOfNotification >= 1000 * 60 * 60) {
+    if (currentLocation.time - _timeOfNotification >= 1000 * 60 * 60) {
       final distance = new Distance();
       final int metersMoved = distance(
           new LatLng(_oldLocation.latitude, _oldLocation.longitude),
@@ -22,7 +22,7 @@ void startListener() {
       if (metersMoved >= 20) {
         showNotification(
             "Bewegung erkannt", "Denke daran, Dein Corona-Tagebuch zu führen.");
-        timeOfNotification = currentLocation.time.toInt();
+        _timeOfNotification = currentLocation.time.toInt();
         _oldLocation = currentLocation;
       }
     }

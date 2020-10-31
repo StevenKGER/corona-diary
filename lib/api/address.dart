@@ -29,7 +29,7 @@ class Address {
 
   @override
   String toString() {
-    var addressArray = {
+    final addressArray = {
       "${this.street} ${this.houseNumber}",
       "${this.postCode} ${this.city}",
       this.subUrb,

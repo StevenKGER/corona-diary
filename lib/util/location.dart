@@ -3,8 +3,6 @@ import 'package:location/location.dart';
 Location location = new Location();
 
 void initLocation() async {
-  Location location = new Location();
-
   var serviceEnabled = await location.serviceEnabled();
   if (!serviceEnabled)
     serviceEnabled = await location.requestService();
