@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 
-bool prev= false;
+bool prev = false;
+double standard = 14;
 
 class Settings extends StatefulWidget {
   Settings({Key key, this.title}) : super(key: key);
@@ -11,8 +12,8 @@ class Settings extends StatefulWidget {
   SettingsState createState() => SettingsState();
 }
 
-class SettingsState extends State<Settings>{
-
+class SettingsState extends State<Settings> {
+  double _currentSliderValue = standard;
 
   @override
   Widget build(BuildContext context) {
@@ -20,12 +21,23 @@ class SettingsState extends State<Settings>{
         appBar: AppBar(
           title: Text("Einstellungen"),
         ),
-        body: Container(
-          child: MyStatefulWidget(),
-        )
-    );
+        body: Column(children: [
+          MyStatefulWidget(),
+          Slider(
+            value: _currentSliderValue,
+            min: 10,
+            max: 25,
+            divisions: 15,
+            label: _currentSliderValue.round().toString(),
+            onChanged: (double value) {
+              setState(() {
+                _currentSliderValue = value;
+                standard= value;
+              });
+            },
+          ),
+        ]));
   }
-
 }
 
 class MyStatefulWidget extends StatefulWidget {
@@ -47,7 +59,7 @@ class _DarkMode extends State<MyStatefulWidget> {
         setState(() {
           isSwitched = value;
           changeBrightness();
-          prev=value;
+          prev = value;
         });
       },
       activeTrackColor: Colors.lightBlueAccent,
