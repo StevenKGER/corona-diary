@@ -15,6 +15,7 @@ class Settings extends StatefulWidget {
 
 class SettingsState extends State<Settings> {
   double _currentSliderValue = standard;
+  bool warn=false;
 
   @override
   Widget build(BuildContext context) {
@@ -34,10 +35,7 @@ class SettingsState extends State<Settings> {
             onChanged: (double value) {
               setState(() {
                 _currentSliderValue = value;
-                if (value >= 14) {
-                  standard = value;
-                }
-                if (value < 14) {
+                if (value < 14 && warn==false) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
@@ -48,6 +46,7 @@ class SettingsState extends State<Settings> {
                             child: Text('Ja'),
                             onPressed: () {
                               standard = value;
+                              warn= true;
                               Navigator.pop(context);
                             }),
                         CupertinoDialogAction(
@@ -62,6 +61,9 @@ class SettingsState extends State<Settings> {
                     ),
                   );
                   _currentSliderValue = value;
+                }
+                if (value >= 14 || warn==true) {
+                  standard = value;
                 }
               });
             },
