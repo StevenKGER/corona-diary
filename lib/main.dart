@@ -80,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: EdgeInsets.only(right: 20.0),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Settings()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsPage()));
                 },
                 child: Icon(
                   Icons.settings,

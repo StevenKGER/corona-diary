@@ -1,21 +1,22 @@
+import 'package:corona_diary/models/settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 
 bool prev = false;
-double standard = 14;
+//double standard = 14;
 
-class Settings extends StatefulWidget {
-  Settings({Key key, this.title}) : super(key: key);
+class SettingsPage extends StatefulWidget {
+  SettingsPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  SettingsState createState() => SettingsState();
+  SettingsPageState createState() => SettingsPageState();
 }
 
-class SettingsState extends State<Settings> {
-  double _currentSliderValue = standard;
-  bool warn=false;
+class SettingsPageState extends State<SettingsPage> {
+  double _currentSliderValue;
+  bool warn = false;
 
   @override
   Widget build(BuildContext context) {
@@ -23,52 +24,66 @@ class SettingsState extends State<Settings> {
         appBar: AppBar(
           title: Text("Einstellungen"),
         ),
-        body: Column(children: [
-          MyStatefulWidget(),
-          Text("Automatisches löschen nach Tagen"),
-          Slider(
-            value: _currentSliderValue,
-            min: 10,
-            max: 25,
-            divisions: 15,
-            label: _currentSliderValue.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                _currentSliderValue = value;
-                if (value < 14 && warn==false) {
-                  showDialog(
-                    context: context,
-                    builder: (_) => CupertinoAlertDialog(
-                      content: Text(
-                          'Automatisches löschen unter 14 Tagen kann Probleme verursachen, sind Sie sich sicher?"'),
-                      actions: [
-                        CupertinoDialogAction(
-                            child: Text('Ja'),
-                            onPressed: () {
-                              standard = value;
-                              warn= true;
-                              Navigator.pop(context);
-                            }),
-                        CupertinoDialogAction(
-                            child: Text('Nein'),
-                            onPressed: () {
-                              standard = 14;
-                              _currentSliderValue = 14;
-                              setState(() {});
-                              Navigator.pop(context);
-                            }),
-                      ],
-                    ),
-                  );
-                  _currentSliderValue = value;
-                }
-                if (value >= 14 || warn==true) {
-                  standard = value;
-                }
-              });
-            },
-          ),
-        ]));
+        body: FutureBuilder<Settings>(
+          future: getSettings(),
+          builder: (BuildContext context, AsyncSnapshot<Settings> snapshot) {
+            if (!snapshot.hasData) return CircularProgressIndicator();
+            final settings = snapshot.data;
+            _currentSliderValue = settings.daysUntilRemoval.toDouble();
+            return Column(children: [
+              MyStatefulWidget(),
+              Text("Automatisches löschen nach Tagen"),
+              Slider(
+                value: _currentSliderValue,
+                min: 10,
+                max: 25,
+                divisions: 15,
+                label: _currentSliderValue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    _currentSliderValue = value;
+                    if (value < 14 && warn == false) {
+                      showDialog(
+                        context: context,
+                        builder: (_) => CupertinoAlertDialog(
+                          content: Text(
+                              'Automatisches löschen unter 14 Tagen kann Probleme verursachen, sind Sie sich sicher?"'),
+                          actions: [
+                            CupertinoDialogAction(
+                                child: Text('Ja'),
+                                onPressed: () {
+                                  //standard = value;
+                                  warn = true;
+                                  Navigator.pop(context);
+                                }),
+                            CupertinoDialogAction(
+                                child: Text('Nein'),
+                                onPressed: () {
+                                  //standard = 14;
+                                  _currentSliderValue = 14;
+                                  settings.daysUntilRemoval = _currentSliderValue.toInt();
+                                  saveSettings(settings);
+                                  setState(() {});
+                                  Navigator.pop(context);
+                                }),
+                          ],
+                        ),
+                      );
+                      _currentSliderValue = value;
+                      settings.daysUntilRemoval = _currentSliderValue.toInt();
+                      saveSettings(settings);
+                    }
+                    if (value >= 14 || warn == true) {
+                      _currentSliderValue = value;
+                      settings.daysUntilRemoval = _currentSliderValue.toInt();
+                      saveSettings(settings);
+                    }
+                  });
+                },
+              ),
+            ]);
+          },
+        ));
   }
 }
 
