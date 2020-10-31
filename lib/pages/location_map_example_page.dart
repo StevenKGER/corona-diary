@@ -51,13 +51,23 @@ class _ExamplePageState extends State<ExamplePage> {
                       "${locationData.latitude}, ${locationData.longitude}")),
               SizedBox(height: 10),
               Container(
-                child: FutureBuilder<List<POI>>(
+                child: FutureBuilder<Map<POI, int>>(
                   future: getPOIsNearBy(
                       locationData.latitude, locationData.longitude),
                   builder: (BuildContext context,
-                      AsyncSnapshot<List<POI>> snapshot) {
+                      AsyncSnapshot<Map<POI, int>> snapshot) {
                     if (!snapshot.hasData) return CircularProgressIndicator();
-                    return Text(snapshot.data.join("\n"));
+
+                    var formattedPOIs = "";
+
+                    snapshot.data.forEach((poi, distanceInMeters) {
+                      formattedPOIs +=
+                          "${poi.name}, ${poi.toShortAddressString()} "
+                          "(ca. ${distanceInMeters}m entfernt) - "
+                          "${poi.type}\n";
+                    });
+
+                    return Text(formattedPOIs);
                   },
                 ),
               ),
