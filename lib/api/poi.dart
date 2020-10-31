@@ -1,6 +1,8 @@
+import 'dart:collection';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:latlong/latlong.dart';
 import 'package:sprintf/sprintf.dart';
 
 class POI {
@@ -11,38 +13,50 @@ class POI {
   String city;
   String subUrb;
   String country;
+  String type;
+  double latitude;
+  double longitude;
 
-  POI(
-    this.name,
-    this.street,
-    this.houseNumber,
-    this.postCode,
-    this.city,
-    this.subUrb,
-    this.country,
-  );
+  POI(this.name, this.street, this.houseNumber, this.postCode, this.city,
+      this.subUrb, this.country, this.type, this.latitude, this.longitude);
 
   factory POI.fromOverPassJson(dynamic json) {
     return POI(
-      json["name"] as String ?? "",
-      json["addr:street"] as String ?? "",
-      json["addr:housenumber"] as String ?? "",
-      json["addr:postcode"] as String ?? "",
-      json["addr:city"] as String ?? "",
-      json["addr:suburb"] as String ?? "",
-      json["addr:country"] as String ?? "",
-    );
+        json["tags"]["name"] as String ?? "",
+        json["tags"]["addr:street"] as String ?? "",
+        json["tags"]["addr:housenumber"] as String ?? "",
+        json["tags"]["addr:postcode"] as String ?? "",
+        json["tags"]["addr:city"] as String ?? "",
+        json["tags"]["addr:suburb"] as String ?? "",
+        json["tags"]["addr:country"] as String ?? "",
+        json["tags"]["amenity"] as String ??
+            json["tags"]["leisure"] as String ??
+            "",
+        json["lat"] as double,
+        json["lon"] as double);
   }
 
   @override
   String toString() {
-    var addressArray = List.of({
+    var addressArray = {
       this.name,
       "${this.street} ${this.houseNumber}",
       "${this.postCode} ${this.city}",
       this.subUrb,
       this.country
-    });
+    };
+
+    return addressArray
+        .where((element) => element.trim().length != 0)
+        .join(", ");
+  }
+
+  String toShortAddressString() {
+    var addressArray = {
+      "${this.street} ${this.houseNumber}",
+      "${this.postCode} ${this.city}",
+      this.subUrb
+    };
 
     return addressArray
         .where((element) => element.trim().length != 0)
@@ -52,33 +66,35 @@ class POI {
 
 var url = "https://overpass-api.de/api/interpreter";
 
-final query = '''<osm-script output="json" timeout="25">
-  <query type="node">
-    <has-kv k="amenity" regv="restaurant|pub"/>
-    <around lat="%f" lon="%f" radius="15"/>
-  </query>
+final query = ''
+    '[out:json][timeout:25];'
+    'node[~"^(amenity|leisure)\$"~"^(restaurant|pub|place_of_worship|cafe|'
+    'fast_food|bar|biergarten|cinema|nightclub|theatre|sports_centre|stadium|'
+    'fitness_centre|water_park|dance|bowling_alley|sports_hall|escape_game)\$"]'
+    '(around:15,%f,%f);'
+    'out qt;';
 
-  <print/>
-</osm-script>''';
+Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
+  final position = new LatLng(lat, lon);
 
-Future<List<POI>> getPOIsNearBy(double lat, double lon) async {
-  var postBody = sprintf(query, [lat, lon]);
-  var response = await http
+  final postBody = sprintf(query, [lat, lon]);
+  final response = await http
       .post(url, body: postBody)
       .timeout(new Duration(seconds: 10), onTimeout: null);
 
-  if (response == null || response.statusCode != 200)
-    return null;
+  if (response == null || response.statusCode != 200) return null;
 
-  List<POI> pois = new List();
+  final Map<POI, int> points = LinkedHashMap();
 
-  var jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+  final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+
   for (var element in jsonResponse["elements"]) {
-    var node = element["tags"];
-
-    POI poi = POI.fromOverPassJson(node);
-    pois.add(poi);
+    POI poi = POI.fromOverPassJson(element);
+    points[poi] = new Distance()
+        .distance(position, new LatLng(poi.latitude, poi.longitude)) // meters
+        .toInt();
   }
 
-  return pois;
+  return SplayTreeMap.from(
+      points, (key1, key2) => points[key1].compareTo(points[key2]));
 }
