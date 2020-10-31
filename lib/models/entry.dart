@@ -37,7 +37,3 @@ class Entry {
 
   Map<String, dynamic> toJson() => _$EntryToJson(this);
 }
-
-void saveEntry(Entry entry) async {
-
-}
