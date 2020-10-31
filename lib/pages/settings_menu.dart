@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 
@@ -33,7 +34,35 @@ class SettingsState extends State<Settings> {
             onChanged: (double value) {
               setState(() {
                 _currentSliderValue = value;
-                standard= value;
+                if (value >= 14) {
+                  standard = value;
+                }
+                if (value < 14) {
+                  showDialog(
+                    context: context,
+                    builder: (_) => CupertinoAlertDialog(
+                      content: Text(
+                          'Automatisches löschen unter 14 Tagen kann Probleme verursachen, sind Sie sich sicher?"'),
+                      actions: [
+                        CupertinoDialogAction(
+                            child: Text('Ja'),
+                            onPressed: () {
+                              standard = value;
+                              Navigator.pop(context);
+                            }),
+                        CupertinoDialogAction(
+                            child: Text('Nein'),
+                            onPressed: () {
+                              standard = 14;
+                              _currentSliderValue = 14;
+                              setState(() {});
+                              Navigator.pop(context);
+                            }),
+                      ],
+                    ),
+                  );
+                  _currentSliderValue = value;
+                }
               });
             },
           ),
@@ -68,6 +97,7 @@ class _DarkMode extends State<MyStatefulWidget> {
       secondary: const Icon(Icons.lightbulb_outline),
     );
   }
+
   void changeBrightness() {
     DynamicTheme.of(context).setBrightness(
         Theme.of(context).brightness == Brightness.dark
