@@ -81,8 +81,7 @@ void removeEntryById(int id) async {
   List<Entry> tempList = [];
   Entries entries = await getAllEntries();
 
-  if (entries.highestId < id)
-    return;
+  if (entries.highestId < id) return;
 
   entries.entryList
       .where((element) => element.id != id)
@@ -95,5 +94,24 @@ void removeEntryById(int id) async {
   }
 
   entries.entryList = tempList;
+  await jsonStore.setItem("entries", entries.toJson());
+}
+
+void removeEntriesOlderThen(int days) async {
+  List<Entry> tempList = [];
+  Entries entries = await getAllEntries();
+
+  entries.entryList.where((element) {
+    final entryDate = DateTime.fromMillisecondsSinceEpoch(element.startTime);
+    final currentDate = DateTime.now();
+
+    if (entryDate.millisecondsSinceEpoch > currentDate.millisecondsSinceEpoch)
+      return true;
+
+    return entryDate.difference(currentDate).inDays < days;
+  }).forEach((element) => tempList.add(element));
+
+  entries.entryList = tempList;
+  entries.highestId = tempList.length - 1;
   await jsonStore.setItem("entries", entries.toJson());
 }
