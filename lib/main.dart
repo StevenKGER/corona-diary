@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
           return new MaterialApp(
             title: 'Flutter Demo',
             theme: theme,
-            home: new MyHomePage(title: 'Flutter Demo Home Page'),
+            home: new MyHomePage(title: 'Corona Tagebuch'),
           );
         }
     );
