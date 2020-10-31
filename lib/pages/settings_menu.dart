@@ -23,6 +23,7 @@ class SettingsState extends State<Settings> {
         ),
         body: Column(children: [
           MyStatefulWidget(),
+          Text("Automatisches löschen nach Tagen"),
           Slider(
             value: _currentSliderValue,
             min: 10,
