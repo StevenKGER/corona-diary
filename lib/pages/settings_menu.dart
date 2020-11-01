@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 
-bool prev = false;
-//double standard = 14;
+bool isDarkMode;
+//double daysUntil;
 
 class SettingsPage extends StatefulWidget {
   SettingsPage({Key key, this.title}) : super(key: key);
@@ -30,8 +30,13 @@ class SettingsPageState extends State<SettingsPage> {
             if (!snapshot.hasData) return CircularProgressIndicator();
             final settings = snapshot.data;
             _currentSliderValue = settings.daysUntilRemoval.toDouble();
+            if(isDarkMode != null){
+              settings.darkMode = isDarkMode;
+              saveSettings(settings);
+            }
+            isDarkMode = settings.darkMode;
             return Column(children: [
-              MyStatefulWidget(),
+              DarkMode(),
               Text("Automatisches löschen nach Tagen"),
               Slider(
                 value: _currentSliderValue,
@@ -42,7 +47,7 @@ class SettingsPageState extends State<SettingsPage> {
                 onChanged: (double value) {
                   setState(() {
                     _currentSliderValue = value;
-                    if (value < 14 && warn == false) {
+                    if (value < 14 && !warn) {
                       showDialog(
                         context: context,
                         builder: (_) => CupertinoAlertDialog(
@@ -73,7 +78,7 @@ class SettingsPageState extends State<SettingsPage> {
                       settings.daysUntilRemoval = _currentSliderValue.toInt();
                       saveSettings(settings);
                     }
-                    if (value >= 14 || warn == true) {
+                    if (value >= 14 || warn) {
                       _currentSliderValue = value;
                       settings.daysUntilRemoval = _currentSliderValue.toInt();
                       saveSettings(settings);
@@ -82,25 +87,29 @@ class SettingsPageState extends State<SettingsPage> {
                 },
               ),
               FlatButton(
-                child: Text('Lizenzen'),
-                onPressed: (){
-                showAboutDialog(context: context);
-              }, )
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text('Lizenzen'),
+                ),
+                onPressed: () {
+                  showAboutDialog(context: context);
+                },
+              )
             ]);
           },
         ));
   }
 }
 
-class MyStatefulWidget extends StatefulWidget {
-  MyStatefulWidget({Key key}) : super(key: key);
+class DarkMode extends StatefulWidget {
+  DarkMode({Key key}) : super(key: key);
 
   @override
   _DarkMode createState() => _DarkMode();
 }
 
-class _DarkMode extends State<MyStatefulWidget> {
-  bool isSwitched = prev;
+class _DarkMode extends State<DarkMode> {
+  bool isSwitched = isDarkMode;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +120,7 @@ class _DarkMode extends State<MyStatefulWidget> {
         setState(() {
           isSwitched = value;
           changeBrightness();
-          prev = value;
+          isDarkMode = value;
         });
       },
       activeTrackColor: Colors.lightBlueAccent,
