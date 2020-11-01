@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:corona_diary/api/address.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong/latlong.dart';
 import 'package:sprintf/sprintf.dart';
@@ -53,8 +54,8 @@ class POI {
 
   String toShortAddressString() {
     final addressArray = {
-      "${this.street} ${this.houseNumber}",
-      "${this.postCode} ${this.city}",
+      "${this.street}${this.houseNumber.isEmpty ? "," : " ${this.houseNumber},"} "
+          "${this.postCode} ${this.city}",
       this.subUrb
     };
 
@@ -89,7 +90,21 @@ Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
   final Map<POI, int> points = LinkedHashMap();
 
   for (var element in jsonResponse["elements"]) {
-    final poi = POI.fromOverPassJson(element);
+    var poi = POI.fromOverPassJson(element);
+    if (poi.street.isEmpty) {
+      var address = await getAddressOfLocation(poi.latitude, poi.longitude);
+      poi = POI(
+          poi.name,
+          address.street,
+          address.houseNumber,
+          address.postCode,
+          address.city,
+          address.subUrb,
+          address.country,
+          poi.type,
+          poi.latitude,
+          poi.longitude);
+    }
     points[poi] = new Distance()
         .distance(position, new LatLng(poi.latitude, poi.longitude)) // meters
         .toInt();

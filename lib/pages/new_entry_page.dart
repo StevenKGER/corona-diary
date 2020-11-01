@@ -89,9 +89,9 @@ class EntryForm extends StatefulWidget {
 
 class _EntryFormState extends State<EntryForm> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _controllerAddress ;
+  TextEditingController _controllerAddress;
   String _textAddress = "";
-  TextEditingController _controllerDescription ;
+  TextEditingController _controllerDescription;
   String _textDescription = "";
 
   @override
@@ -113,7 +113,9 @@ class _EntryFormState extends State<EntryForm> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextFormField(
-              onChanged: (v)=>setState((){_textAddress=v;}),
+              onChanged: (v) => setState(() {
+                _textAddress = v;
+              }),
               controller: _controllerAddress,
               /*onChanged: (value) {
                 description = value;
@@ -129,15 +131,14 @@ class _EntryFormState extends State<EntryForm> {
                 (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
               if (!snapshot.hasData)
                 return Center(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 130),
-                    child: SizedBox(
-                      child:CircularProgressIndicator(),
-                      width: 40,
-                      height: 40,
-                    ),
-                  )
-                );
+                    child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 130),
+                  child: SizedBox(
+                    child: CircularProgressIndicator(),
+                    width: 40,
+                    height: 40,
+                  ),
+                ));
               final locationData = snapshot.data;
               return Column(
                 children: [
@@ -147,39 +148,38 @@ class _EntryFormState extends State<EntryForm> {
                         locationData.latitude, locationData.longitude),
                     builder: (BuildContext context,
                         AsyncSnapshot<Address> snapshot) {
-                      if (!snapshot.hasData) return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 7.5),
+                      if (!snapshot.hasData)
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 7.5),
                           child: Container(
                             child: CircularProgressIndicator(),
                             height: 35,
                             width: 35,
                           ),
-                      );
+                        );
                       return Container(
                         height: 50,
                         child: SizedBox(
-                          width: MediaQuery.of(context).size.width*0.9,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.room
-                            ),
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: Row(children: [
+                            Icon(Icons.room),
                             FlatButton(
                               textColor: Colors.blueGrey,
                               onPressed: () {
                                 setState(() {
-                                  _controllerAddress.text = "${snapshot.data.toString()}";
+                                  _controllerAddress.text =
+                                      "${snapshot.data.toString()}";
                                 });
                               },
-                                child: SizedBox(
-                                  width: MediaQuery.of(context).size.width*0.7,
-                                    child: Text(snapshot.data.toString(), overflow: TextOverflow.visible)
-                                ),
-                              ),
-                        ]
+                              child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.7,
+                                  child: Text(snapshot.data.toString(),
+                                      overflow: TextOverflow.visible)),
+                            ),
+                          ]),
                         ),
-                      ),
-                        );
+                      );
                     },
                   ),
                   Container(
@@ -191,30 +191,45 @@ class _EntryFormState extends State<EntryForm> {
                           AsyncSnapshot<Map<POI, int>> snapshot) {
                         if (!snapshot.hasData)
                           return Center(
-                              child: SizedBox(
-                              child:CircularProgressIndicator(),
+                            child: SizedBox(
+                              child: CircularProgressIndicator(),
                               width: 40,
                               height: 40,
                             ),
                           );
                         return ListView.builder(
-                              padding: const EdgeInsets.all(8),
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return Container(
-                                  height: 40,
-                                  child: Center(
-                                    child: FlatButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          _controllerAddress.text = "${snapshot.data.keys.elementAt(index)}";
-                                        });
-                                      },
-                                      child: Text("${snapshot.data.keys.elementAt(index)}")
-                                    ),
+                            padding: const EdgeInsets.all(8),
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                height: 40,
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: FlatButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _controllerAddress.text =
+                                            "${snapshot.data.keys.elementAt(index)}";
+                                      });
+                                    },
+                                    child: RichText(
+                                        text: TextSpan(
+                                      style: DefaultTextStyle.of(context).style,
+                                      children: <TextSpan>[
+                                        TextSpan(
+                                            text:
+                                                "${snapshot.data.keys.elementAt(index).name}\n",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                        TextSpan(
+                                            text:
+                                                "${snapshot.data.keys.elementAt(index).toShortAddressString()}")
+                                      ],
+                                    )),
                                   ),
-                                );
-                              });
+                                ),
+                              );
+                            });
                       },
                     ),
                   ),
