@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       ),
         themedWidgetBuilder: (context, theme) {
           return new MaterialApp(
-            title: 'Flutter Demo',
+            title: 'Corona Tagebuch',
             theme: theme,
             home: new MyHomePage(title: 'Corona Tagebuch'),
           );

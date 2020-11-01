@@ -81,6 +81,11 @@ class SettingsPageState extends State<SettingsPage> {
                   });
                 },
               ),
+              FlatButton(
+                child: Text('Lizenzen'),
+                onPressed: (){
+                showAboutDialog(context: context);
+              }, )
             ]);
           },
         ));
