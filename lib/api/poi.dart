@@ -55,7 +55,7 @@ var url = "https://overpass-api.de/api/interpreter";
 final query = '''<osm-script output="json" timeout="25">
   <query type="node">
     <has-kv k="amenity" regv="restaurant|pub"/>
-    <around lat="%f" lon="%f" radius="200"/>
+    <around lat="%f" lon="%f" radius="15"/>
   </query>
 
   <print/>

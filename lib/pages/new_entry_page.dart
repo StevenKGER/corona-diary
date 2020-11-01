@@ -157,15 +157,29 @@ class _EntryFormState extends State<EntryForm> {
                       );
                       return Container(
                         height: 50,
-                        child: FlatButton(
-                            textColor: Colors.blueGrey,
-                          onPressed: () {
-                            setState(() {
-                              _controllerAddress.text = "${snapshot.data.toString()}";
-                            });
-                          },
-                          child: Text(snapshot.data.toString())
-                      ),);
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width*0.9,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.room
+                            ),
+                            FlatButton(
+                              textColor: Colors.blueGrey,
+                              onPressed: () {
+                                setState(() {
+                                  _controllerAddress.text = "${snapshot.data.toString()}";
+                                });
+                              },
+                                child: SizedBox(
+                                  width: MediaQuery.of(context).size.width*0.7,
+                                    child: Text(snapshot.data.toString(), overflow: TextOverflow.visible)
+                                ),
+                              ),
+                        ]
+                        ),
+                      ),
+                        );
                     },
                   ),
                   Container(
