@@ -15,8 +15,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,29 +26,39 @@ class SettingsPageState extends State<SettingsPage> {
           builder: (BuildContext context, AsyncSnapshot<Settings> snapshot) {
             if (!snapshot.hasData) return CircularProgressIndicator();
             final settings = snapshot.data;
-            if (_currentSliderValue != null){
-              settings.daysUntilRemoval = _currentSliderValue.toInt();
-              saveSettings(settings);
-            }
             _currentSliderValue = settings.daysUntilRemoval.toDouble();
-            if(isDarkMode != null){
-              settings.darkMode = isDarkMode;
-              saveSettings(settings);
-            }
             isDarkMode = settings.darkMode;
             return Column(children: [
-              DarkMode(),
+              DarkMode(settings: settings),
               Text("Automatisches löschen nach Tagen"),
-              AutomaticDeletion(),
+              AutomaticDeletion(settings: settings),
               FlatButton(
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text('Lizenzen'),
-                ),
+                child: Text("Datenschutzerklärung"),
                 onPressed: () {
-                  showAboutDialog(context: context);
+                  showDialog(
+                    context: context,
+                    builder: (_) => CupertinoAlertDialog(
+                      content: Text(
+                          'Hier steht sehr sehr sehr sehr sehr viel Text"'),
+                      actions: [
+                        CupertinoDialogAction(
+                            child: Text('Okay'),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            }),
+                      ],
+                    ),
+                  );
                 },
-              )
+              ),
+              FlatButton(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text('Lizenzen'),
+                  ),
+                  onPressed: () {
+                    showAboutDialog(context: context);
+                  }),
             ]);
           },
         ));
@@ -58,7 +66,8 @@ class SettingsPageState extends State<SettingsPage> {
 }
 
 class DarkMode extends StatefulWidget {
-  DarkMode({Key key}) : super(key: key);
+  DarkMode({Key key, this.settings}) : super(key: key);
+  Settings settings;
 
   @override
   _DarkMode createState() => _DarkMode();
@@ -77,6 +86,8 @@ class _DarkMode extends State<DarkMode> {
           isSwitched = value;
           changeBrightness();
           isDarkMode = value;
+          widget.settings.darkMode = isDarkMode;
+          saveSettings(widget.settings);
         });
       },
       activeTrackColor: Colors.lightBlueAccent,
@@ -94,16 +105,17 @@ class _DarkMode extends State<DarkMode> {
 }
 
 class AutomaticDeletion extends StatefulWidget {
-  AutomaticDeletion({Key key}) : super(key: key);
+  AutomaticDeletion({Key key, this.settings}) : super(key: key);
+  Settings settings;
 
   @override
   _AutomaticDeletion createState() => _AutomaticDeletion();
 }
 
-class _AutomaticDeletion extends State<AutomaticDeletion>{
-  //double _currentSliderValue;
+class _AutomaticDeletion extends State<AutomaticDeletion> {
   bool warn = false;
-  Widget build(BuildContext context){
+
+  Widget build(BuildContext context) {
     return Slider(
       value: _currentSliderValue,
       min: 10,
@@ -112,36 +124,42 @@ class _AutomaticDeletion extends State<AutomaticDeletion>{
       label: _currentSliderValue.round().toString(),
       onChanged: (double value) {
         setState(() {
-          _currentSliderValue = value;
+          //_currentSliderValue = value;
           if (value < 14 && !warn) {
             showDialog(
               context: context,
               builder: (_) => CupertinoAlertDialog(
                 content: Text(
-                    'Automatisches löschen unter 14 Tagen kann Probleme verursachen, sind Sie sich sicher?"'),
+                    'Automatisches löschen unter 14 Tagen kann Probleme verursachen, sind Sie sich sicher?'),
                 actions: [
                   CupertinoDialogAction(
                       child: Text('Ja'),
                       onPressed: () {
-                        //standard = value;
                         warn = true;
+                        setState(() {});
                         Navigator.pop(context);
                       }),
                   CupertinoDialogAction(
                       child: Text('Nein'),
                       onPressed: () {
-                        //standard = 14;
                         _currentSliderValue = 14;
+                        widget.settings.daysUntilRemoval =
+                            _currentSliderValue.toInt();
+                        saveSettings(widget.settings);
                         setState(() {});
                         Navigator.pop(context);
                       }),
                 ],
               ),
             );
-            _currentSliderValue = value;
+            widget.settings.daysUntilRemoval = _currentSliderValue.toInt();
+            saveSettings(widget.settings);
           }
           if (value >= 14 || warn) {
             _currentSliderValue = value;
+            widget.settings.daysUntilRemoval = _currentSliderValue.toInt();
+            saveSettings(widget.settings);
+            setState(() => {SettingsPage});
           }
         });
       },
