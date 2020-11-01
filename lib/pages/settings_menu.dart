@@ -2,6 +2,7 @@ import 'package:corona_diary/models/settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
+import 'privacy_policy_page.dart';
 
 bool isDarkMode;
 double _currentSliderValue;
@@ -30,25 +31,15 @@ class SettingsPageState extends State<SettingsPage> {
             isDarkMode = settings.darkMode;
             return Column(children: [
               DarkMode(settings: settings),
-              Text("Automatisches löschen nach Tagen"),
+              Text("Tage bis zur Löschung eines Eintrags"),
               AutomaticDeletion(settings: settings),
               FlatButton(
                 child: Text("Datenschutzerklärung"),
                 onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => CupertinoAlertDialog(
-                      content: Text(
-                          'Hier steht sehr sehr sehr sehr sehr viel Text"'),
-                      actions: [
-                        CupertinoDialogAction(
-                            child: Text('Okay'),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            }),
-                      ],
-                    ),
-                  );
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PrivacyPolicyPage()));
                 },
               ),
               FlatButton(
@@ -57,7 +48,10 @@ class SettingsPageState extends State<SettingsPage> {
                     child: Text('Lizenzen'),
                   ),
                   onPressed: () {
-                    showAboutDialog(context: context);
+                    showAboutDialog(context: context, children: <Widget>[
+                      Text("Made by Alp, Nika, Liadan and Steven with ♥ in"
+                          " Berlin"),
+                    ]);
                   }),
             ]);
           },
