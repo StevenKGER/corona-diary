@@ -47,6 +47,16 @@ class BasicDateTimeField extends StatelessWidget {
           helperText: this.text,
           border: const OutlineInputBorder(),
         ),
+        validator: (value) {
+          if (this.text == "Startzeit" && value == null) {
+            return "Bitte gib eine Startzeit an.";
+          }
+
+          if (this.text == "Startzeit" && (startTime.isAfter(endTime))) {
+            return "Die Startzeit muss vor der Endzeit liegen.";
+          }
+          return null;
+        },
         initialValue: currentTime,
         onChanged: (currentValue) {
           if (this.text == "Startzeit") {
@@ -54,8 +64,6 @@ class BasicDateTimeField extends StatelessWidget {
           } else {
             endTime = currentValue;
           }
-          // save value
-          //print(currentValue);
         },
         onShowPicker: (context, currentValue) async {
           final date = await showDatePicker(
@@ -113,130 +121,132 @@ class _EntryFormState extends State<EntryForm> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {
+                  return 'Bitte wähle einen Ort aus oder gib einen ein.';
+                }
+                return null;
+              },
               onChanged: (v) => setState(() {
                 _textAddress = v;
               }),
               controller: _controllerAddress,
-              /*onChanged: (value) {
-                description = value;
-              },*/
               decoration: const InputDecoration(
                 hintText: 'Ort',
               ),
             ),
           ),
           FutureBuilder<LocationData>(
-            future: getLocation(),
-            builder:
-                (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
-              if (!snapshot.hasData)
-                return Center(
-                    child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: 130),
-                  child: SizedBox(
-                    child: CircularProgressIndicator(),
-                    width: 40,
-                    height: 40,
-                  ),
-                ));
-              final locationData = snapshot.data;
-              return Column(
-                children: [
-                  //SizedBox(height: 10),
-                  FutureBuilder<Address>(
-                    future: getAddressOfLocation(
-                        locationData.latitude, locationData.longitude),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<Address> snapshot) {
-                      if (!snapshot.hasData)
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 7.5),
-                          child: Container(
-                            child: CircularProgressIndicator(),
-                            height: 35,
-                            width: 35,
-                          ),
-                        );
-                      return Container(
-                        height: 50,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: Row(children: [
-                            Icon(Icons.room),
-                            FlatButton(
-                              textColor: Colors.blueGrey,
-                              onPressed: () {
-                                setState(() {
-                                  _controllerAddress.text =
-                                      "${snapshot.data.toString()}";
-                                });
-                              },
-                              child: SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.7,
-                                  child: Text(snapshot.data.toString(),
-                                      overflow: TextOverflow.visible)),
-                            ),
-                          ]),
-                        ),
-                      );
-                    },
-                  ),
-                  Container(
-                    height: 250,
-                    child: FutureBuilder<Map<POI, int>>(
-                      future: getPOIsNearBy(
+              future: getLocation(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
+                if (!snapshot.hasData)
+                  return Center(
+                      child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 130),
+                    child: SizedBox(
+                      child: CircularProgressIndicator(),
+                      width: 40,
+                      height: 40,
+                    ),
+                  ));
+                final locationData = snapshot.data;
+                return Column(
+                  children: [
+                    FutureBuilder<Address>(
+                      future: getAddressOfLocation(
                           locationData.latitude, locationData.longitude),
                       builder: (BuildContext context,
-                          AsyncSnapshot<Map<POI, int>> snapshot) {
+                          AsyncSnapshot<Address> snapshot) {
                         if (!snapshot.hasData)
-                          return Center(
-                            child: SizedBox(
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 7.5),
+                            child: Container(
                               child: CircularProgressIndicator(),
-                              width: 40,
-                              height: 40,
+                              height: 35,
+                              width: 35,
                             ),
                           );
-                        return ListView.builder(
-                            padding: const EdgeInsets.all(8),
-                            itemCount: snapshot.data.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                height: 40,
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: FlatButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        _controllerAddress.text =
-                                            "${snapshot.data.keys.elementAt(index)}";
-                                      });
-                                    },
-                                    child: RichText(
-                                        text: TextSpan(
-                                      style: DefaultTextStyle.of(context).style,
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text:
-                                                "${snapshot.data.keys.elementAt(index).name}\n",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.bold)),
-                                        TextSpan(
-                                            text:
-                                                "${snapshot.data.keys.elementAt(index).toShortAddressString()}")
-                                      ],
-                                    )),
-                                  ),
-                                ),
-                              );
-                            });
+                        return Container(
+                          height: 50,
+                          child: SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: Row(children: [
+                              Icon(Icons.room),
+                              FlatButton(
+                                textColor: Colors.blueGrey,
+                                onPressed: () {
+                                  setState(() {
+                                    _controllerAddress.text =
+                                        "${snapshot.data.toString()}";
+                                  });
+                                },
+                                child: SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(snapshot.data.toString(),
+                                        overflow: TextOverflow.visible)),
+                              ),
+                            ]),
+                          ),
+                        );
                       },
                     ),
-                  ),
-                ],
-              );
-            },
-          ),
+                    Container(
+                      height: 250,
+                      child: FutureBuilder<Map<POI, int>>(
+                        future: getPOIsNearBy(
+                            locationData.latitude, locationData.longitude),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<Map<POI, int>> snapshot) {
+                          if (!snapshot.hasData)
+                            return Center(
+                              child: SizedBox(
+                                child: CircularProgressIndicator(),
+                                width: 40,
+                                height: 40,
+                              ),
+                            );
+                          return ListView.builder(
+                              padding: const EdgeInsets.all(8),
+                              itemCount: snapshot.data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Container(
+                                  height: 40,
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: FlatButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _controllerAddress.text =
+                                              "${snapshot.data.keys.elementAt(index)}";
+                                        });
+                                      },
+                                      child: RichText(
+                                          text: TextSpan(
+                                        style:
+                                            DefaultTextStyle.of(context).style,
+                                        children: <TextSpan>[
+                                          TextSpan(
+                                              text:
+                                                  "${snapshot.data.keys.elementAt(index).name}\n",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold)),
+                                          TextSpan(
+                                              text:
+                                                  "${snapshot.data.keys.elementAt(index).toShortAddressString()}")
+                                        ],
+                                      )),
+                                    ),
+                                  ),
+                                );
+                              });
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              }),
           BasicDateTimeField(true, "Startzeit"),
           BasicDateTimeField(false, "Endzeit"),
           Padding(
@@ -263,15 +273,13 @@ class _EntryFormState extends State<EntryForm> {
                 onPressed: () {
                   // Validate will return true if the form is valid, or false if
                   // the form is invalid.
+                  if (_formKey.currentState.validate()) {
+                    print("valid");
+                  }
                   print(_controllerAddress.text);
-                  print("Start: $startTime");
-                  print("End: $endTime");
                   print(_controllerDescription.text);
                   startTime = null;
                   endTime = null;
-                  //if (_formKey.currentState.validate()) {
-                  // Process data.
-                  //}
                 },
                 child: Text('Eintrag erstellen'),
               ),
