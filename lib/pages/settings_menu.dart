@@ -131,11 +131,11 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
                 }
-                if (days < 10 || days > 100) {
+                if (days < 10 || days > 100 || days==null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Probleme und so blabla?'),
+                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
@@ -148,7 +148,6 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                   );
                 }
               },
-              //textAlign: TextAlign.center,
               controller: _controller,
               keyboardType: TextInputType.numberWithOptions(
                   decimal: false, signed: false),
@@ -176,11 +175,11 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
                 }
-                if (days < 10 || days >= 100) {
+                if (days < 10 || days >= 100 || days==null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Probleme und so blabla?'),
+                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
@@ -211,11 +210,11 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
                 }
-                if (days < 10 || days >= 100) {
+                if (days < 10 || days >= 100 || days==null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Probleme und so blabla?'),
+                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
