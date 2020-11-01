@@ -1,4 +1,5 @@
 import 'package:corona_diary/models/settings.dart';
+import 'package:corona_diary/models/entries.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -130,12 +131,14 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                   widget.settings.daysUntilRemoval =
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
+                  removeEntriesOlderThen(days);
                 }
-                if (days < 10 || days > 100 || days==null) {
+                if (days < 10 || days > 100 || days == null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
+                      content: Text(
+                          'Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
@@ -174,12 +177,14 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                   widget.settings.daysUntilRemoval =
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
+                  removeEntriesOlderThen(days);
                 }
-                if (days < 10 || days >= 100 || days==null) {
+                if (days < 10 || days >= 100 || days == null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
+                      content: Text(
+                          'Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
@@ -209,12 +214,14 @@ class _AutomaticDeletion extends State<AutomaticDeletion> {
                   widget.settings.daysUntilRemoval =
                       int.parse(_controller.text);
                   saveSettings(widget.settings);
+                  removeEntriesOlderThen(days);
                 }
-                if (days < 10 || days >= 100 || days==null) {
+                if (days < 10 || days >= 100 || days == null) {
                   showDialog(
                     context: context,
                     builder: (_) => CupertinoAlertDialog(
-                      content: Text('Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
+                      content: Text(
+                          'Unter 10 oder über 100 Tage könnte Probleme erzeugen, daher ist dies nicht möglich'),
                       actions: [
                         CupertinoDialogAction(
                             child: Text('Ok'),
