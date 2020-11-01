@@ -243,7 +243,9 @@ class _EntryFormState extends State<EntryForm> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextFormField(
               onChanged: (value) {
-                description = value;
+                setState(() {
+                  _controllerDescription.text = value;
+                });
               },
               decoration: const InputDecoration(
                 hintText: 'Beschreibung (optional)',
@@ -264,10 +266,9 @@ class _EntryFormState extends State<EntryForm> {
                   print(_controllerAddress.text);
                   print("Start: $startTime");
                   print("End: $endTime");
-                  print("des: $description");
+                  print(_controllerDescription.text);
                   startTime = null;
                   endTime = null;
-                  description = null;
                   //if (_formKey.currentState.validate()) {
                   // Process data.
                   //}
