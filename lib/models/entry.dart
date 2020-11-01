@@ -5,6 +5,7 @@ part 'entry.g.dart';
 @JsonSerializable()
 class Entry {
   int id;
+  String name;
   String street;
   String houseNumber;
   String postCode;
@@ -20,6 +21,7 @@ class Entry {
 
   Entry(
       this.id,
+      this.name,
       this.street,
       this.houseNumber,
       this.postCode,

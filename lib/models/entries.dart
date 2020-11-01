@@ -23,13 +23,14 @@ Future<Entries> getAllEntries() async {
   return Entries.fromJson(await jsonStore.getItem("entries"));
 }
 
-void addEntryByAddress(
-    Address address, String description, int startTime, int endTime) async {
+void addEntryByAddress(String name, Address address, String description,
+    int startTime, int endTime) async {
   Entries entries = await getAllEntries();
 
   var newID = entries.highestId + 1;
   entries.entryList.add(Entry(
       newID,
+      name,
       address.street,
       address.houseNumber,
       address.postCode,
@@ -47,13 +48,14 @@ void addEntryByAddress(
   await jsonStore.setItem("entries", entries.toJson());
 }
 
-void addEntryByPOI(
-    POI poi, String description, int startTime, int endTime) async {
+void addEntryByPOI(String name, POI poi, String description, int startTime,
+    int endTime) async {
   Entries entries = await getAllEntries();
 
   var newID = entries.highestId + 1;
   entries.entryList.add(Entry(
       newID,
+      name,
       poi.street,
       poi.houseNumber,
       poi.postCode,
