@@ -184,11 +184,11 @@ class _EntryFormState extends State<EntryForm> {
                   ),
                   Container(
                     height: 250,
-                    child: FutureBuilder<List<POI>>(
+                    child: FutureBuilder<Map<POI, int>>(
                       future: getPOIsNearBy(
                           locationData.latitude, locationData.longitude),
                       builder: (BuildContext context,
-                          AsyncSnapshot<List<POI>> snapshot) {
+                          AsyncSnapshot<Map<POI, int>> snapshot) {
                         if (!snapshot.hasData)
                           return Center(
                               child: SizedBox(
@@ -207,10 +207,10 @@ class _EntryFormState extends State<EntryForm> {
                                     child: FlatButton(
                                       onPressed: () {
                                         setState(() {
-                                          _controllerAddress.text = "${snapshot.data[index]}";
+                                          _controllerAddress.text = "${snapshot.data.keys.elementAt(index)}";
                                         });
                                       },
-                                      child: Text("${snapshot.data[index]}")
+                                      child: Text("${snapshot.data.keys.elementAt(index)}")
                                     ),
                                   ),
                                 );
