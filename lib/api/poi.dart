@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'package:latlong/latlong.dart';
 import 'package:sprintf/sprintf.dart';
 
+final Map<Map<double, double>, CachedPOIList> _cache = HashMap();
+final _ttl = new Duration(minutes: 10);
+
 class POI {
   String name;
   String street;
@@ -65,6 +68,13 @@ class POI {
   }
 }
 
+class CachedPOIList {
+  dynamic pois;
+  int expiringDate;
+
+  CachedPOIList(this.pois, this.expiringDate);
+}
+
 final url = "https://overpass-api.de/api/interpreter";
 
 final query = ''
@@ -72,20 +82,27 @@ final query = ''
     'node[~"^(amenity|leisure)\$"~"^(restaurant|pub|place_of_worship|cafe|'
     'fast_food|bar|biergarten|cinema|nightclub|theatre|sports_centre|stadium|'
     'fitness_centre|water_park|dance|bowling_alley|sports_hall|escape_game)\$"]'
-    '(around:25,%f,%f);'
+    '(around:150,%f,%f);'
     'out qt;';
 
 Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
   final position = new LatLng(lat, lon);
 
-  final postBody = sprintf(query, [lat, lon]);
-  final response = await http
-      .post(url, body: postBody)
-      .timeout(new Duration(seconds: 10), onTimeout: null);
+  final cachedEntry = _cache[{lat: lon}];
+  var jsonResponse;
 
-  if (response == null || response.statusCode != 200) return null;
+  if (cachedEntry != null && cachedEntry.expiringDate < DateTime.now().add(_ttl).millisecondsSinceEpoch) {
+    jsonResponse = cachedEntry.pois;
+  } else {
+    final postBody = sprintf(query, [lat, lon]);
+    final response = await http
+        .post(url, body: postBody)
+        .timeout(new Duration(seconds: 10), onTimeout: null);
 
-  final jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+    if (response == null || response.statusCode != 200) return null;
+
+    jsonResponse = jsonDecode(utf8.decode(response.bodyBytes));
+  }
 
   final Map<POI, int> points = LinkedHashMap();
 

@@ -1,4 +1,9 @@
+import 'dart:collection';
+
 import 'package:osm_nominatim/osm_nominatim.dart';
+
+final Map<Map<double, double>, CachedAddress> _cache = HashMap();
+final _ttl = new Duration(minutes: 10);
 
 class Address {
   String street;
@@ -44,11 +49,30 @@ class Address {
   }
 }
 
-Future<Address> getAddressOfLocation(double lat, double lon) async {
-  Place place = await Nominatim.reverseSearch(
-      lat: lat, lon: lon, addressDetails: true, zoom: 2);
+class CachedAddress {
+  Address address;
+  int expiringDate;
 
-  return Address.fromNominatimPlace(place.address, place.lat, place.lon);
+  CachedAddress(this.address, this.expiringDate);
+}
+
+Future<Address> getAddressOfLocation(double lat, double lon) async {
+  final cachedEntry = _cache[{lat: lon}];
+  if (cachedEntry != null &&
+      cachedEntry.expiringDate <
+          DateTime.now().add(_ttl).millisecondsSinceEpoch) {
+    return cachedEntry.address;
+  }
+
+  Place place = await Nominatim.reverseSearch(
+      lat: lat, lon: lon, addressDetails: true, zoom: 18);
+
+  final address =
+      Address.fromNominatimPlace(place.address, place.lat, place.lon);
+  _cache[{lat: lon}] =
+      CachedAddress(address, DateTime.now().add(_ttl).millisecondsSinceEpoch);
+
+  return address;
 }
 
 Future<List<Address>> searchAddress(
@@ -56,7 +80,7 @@ Future<List<Address>> searchAddress(
   List<Address> addresses = List<Address>();
 
   final places = await Nominatim.searchByName(
-      street: street, postalCode: postCode, city: city);
+      street: street, postalCode: postCode, city: city, addressDetails: true);
 
   for (var place in places) {
     addresses
