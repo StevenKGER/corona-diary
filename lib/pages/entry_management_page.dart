@@ -261,6 +261,7 @@ class _EntryFormState extends State<EntryForm> {
 
                                                   _controllerAddress.text = "$_selectedPOI";
                                                   _controllerName.text = _selectedPOI.name;
+                                                  _textName = _selectedPOI.name;
                                                 });
                                               },
                                               child: RichText(
