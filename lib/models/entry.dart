@@ -5,6 +5,7 @@ part 'entry.g.dart';
 @JsonSerializable()
 class Entry {
   int id;
+  String name;
   String street;
   String houseNumber;
   String postCode;
@@ -20,6 +21,7 @@ class Entry {
 
   Entry(
       this.id,
+      this.name,
       this.street,
       this.houseNumber,
       this.postCode,
@@ -36,4 +38,17 @@ class Entry {
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$EntryToJson(this);
+
+  String toAddressString() {
+    final addressArray = {
+      "${this.street} ${this.houseNumber}",
+      "${this.postCode} ${this.city}",
+      this.subUrb,
+      this.country
+    };
+
+    return addressArray
+        .where((element) => element.trim().length != 0)
+        .join(", ");
+  }
 }

@@ -24,12 +24,13 @@ Future<Entries> getAllEntries() async {
 }
 
 void addEntryByAddress(
-    Address address, String description, int startTime, int endTime) async {
+    String name, Address address, String description, int startTime, int endTime) async {
   Entries entries = await getAllEntries();
 
   var newID = entries.highestId + 1;
   entries.entryList.add(Entry(
       newID,
+      name,
       address.street,
       address.houseNumber,
       address.postCode,
@@ -48,12 +49,13 @@ void addEntryByAddress(
 }
 
 void addEntryByPOI(
-    POI poi, String description, int startTime, int endTime) async {
+    String name, POI poi, String description, int startTime, int endTime) async {
   Entries entries = await getAllEntries();
 
   var newID = entries.highestId + 1;
   entries.entryList.add(Entry(
       newID,
+      name,
       poi.street,
       poi.houseNumber,
       poi.postCode,
