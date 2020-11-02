@@ -21,8 +21,6 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  dynamic_theme: ^1.0.0
-  flutter_switch: ^0.1.4
   flutter:
     sdk: flutter
 
@@ -46,6 +44,13 @@ dependencies:
   # Libraries for JSON storing
   json_store: ^1.1.0
   json_annotation: ^3.1.0
+  # Theme switch
+  dynamic_theme: ^1.0.0
+  flutter_switch: ^0.1.4
+  # Date picker
+  datetime_picker_formfield: ^1.0.0
+  # Toast notification
+  fluttertoast: ^7.1.1
 
 
 dev_dependencies:
