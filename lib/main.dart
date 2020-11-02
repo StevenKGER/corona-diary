@@ -1,3 +1,9 @@
+import 'package:corona_diary/api/map.dart';
+import 'package:corona_diary/models/entries.dart';
+import 'package:corona_diary/util/location.dart';
+import 'package:corona_diary/util/notification.dart';
+import 'package:corona_diary/util/store.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'pages/settings_menu.dart';
 
@@ -5,11 +11,10 @@ import 'package:dynamic_theme/dynamic_theme.dart';
 
 
 void main() {
-  runApp(MyApp());
+  runApp(CoronaDiaryApp());
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class CoronaDiaryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new DynamicTheme(
@@ -20,59 +25,41 @@ class MyApp extends StatelessWidget {
       ),
         themedWidgetBuilder: (context, theme) {
           return new MaterialApp(
-            title: 'Corona Tagebuch',
+            title: 'Corona-Tagebuch',
             theme: theme,
-            home: new MyHomePage(title: 'Corona Tagebuch'),
+            home: new MainPage(title: 'Corona-Tagebuch'),
           );
         }
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
+class MainPage extends StatefulWidget {
+  MainPage({Key key, this.title}) : super(key: key);
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainPageState extends State<MainPage> {
+  @override
+  void initState() {
+    super.initState();
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+    initJsonStore();
+    initLocation();
+    initNotifications();
+  }
+
+  void setStateRemote(Function function) {
+    setState(function);
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
 
         actions: <Widget>[
@@ -90,42 +77,151 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+      body: FutureBuilder<List<Widget>>(
+        future: generateOverview(context, this.setStateRemote),
+        builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
+          if (!snapshot.hasData)
+            return Center(child: CircularProgressIndicator());
+          if (snapshot.data[0] is Center) return snapshot.data[0];
+          return Center(
+            child: ListView(
+              padding: EdgeInsets.all(20.0),
+              children: snapshot.data,
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () {},
         tooltip: 'Increment',
         child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
 
+Future<List<Widget>> generateOverview(
+    BuildContext context, Function stateCallback) async {
+  //addEntryByAddress('Test', await getAddressOfLocation(52.509171, 13.375490),
+  //'testdes', DateTime
+  //.now()
+  //.millisecondsSinceEpoch, null);
+  List<Widget> widgets = [];
+  Entries entries = await getAllEntries();
+  entries.entryList.forEach((entry) {
+    String date =
+        DateTime.fromMillisecondsSinceEpoch(entry.startTime).toString();
+    String yearMonthDay = date.substring(0, 10);
+    String year = yearMonthDay.substring(0, 4);
+    String month = yearMonthDay.substring(5, 7);
+    String day = yearMonthDay.substring(8, 10);
+    yearMonthDay = day + "." + month + "." + year;
+    String time = date.substring(11, 16);
+    var container = GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+            border: Border.all(color: Colors.lightBlue, width: 2)),
+        child: Column(
+          children: [
+            Container(
+              child: renderMap(context, entry.latitude, entry.longitude),
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+              child: RichText(
+                text: new TextSpan(
+                  style: new TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.black,
+                  ),
+                  children: <TextSpan>[
+                    new TextSpan(
+                        text: ("\n${entry.name}"),
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 25.0)),
+                    new TextSpan(text: ("\n${entry.toAddressString()}\n")),
+                    new TextSpan(
+                        text: "Startzeit:\n",
+                        style: new TextStyle(
+                          fontWeight: FontWeight.bold,
+                        )),
+                    new TextSpan(text: yearMonthDay + "   " + time),
+                    new TextSpan(
+                        text: (entry.endTime != null ? "\nEndzeit:" : ""),
+                        style: new TextStyle(
+                          fontWeight: FontWeight.bold,
+                        )),
+                    new TextSpan(
+                        text:
+                            (entry.endTime != null ? "${entry.endTime}" : "")),
+                    new TextSpan(
+                        text: ((entry.description ?? "").trim().isNotEmpty
+                            ? "\nBeschreibung: \n"
+                            : ""),
+                        style: new TextStyle(
+                          fontWeight: FontWeight.bold,
+                        )),
+                    new TextSpan(
+                      text: ((entry.description ?? "").trim().isNotEmpty
+                          ? "${entry.description}"
+                          : ""),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      onTap: () {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Bearbeiten"),
+                content: Text("Was möchtest du tun?"),
+                actions: <Widget>[
+                  FlatButton(
+                      child: Text("Löschen"),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        removeEntryById(entry.id);
+                        stateCallback(() {});
+                      }),
+                  FlatButton(
+                      child: Text("Bearbeiten"),
+                      onPressed: () => Navigator.of(context).pop()),
+                  FlatButton(
+                      child: Text("Abbrechen"),
+                      onPressed: () => Navigator.of(context).pop())
+                ],
+              );
+            });
+      },
+    );
+    widgets.add(container);
+    widgets.add(SizedBox(height: 15));
+  });
+  if (entries.entryList.isEmpty) {
+    var infoText = Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(15, 0, 15, 10),
+            child: Text(
+              "Die Welt ist groß, aber für die App ist sie noch klein. Besuche sie, halte aber Abstand und denke an deine Mund-Nasen-Bedeckung!",
+              textAlign: TextAlign.center,
+              style: new TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 30.0,
+                  color: Color.fromARGB(255, 122, 122, 122)),
+            ),
+          ),
+        ]));
+    widgets.add(infoText);
+  }
+  return widgets;
+}
