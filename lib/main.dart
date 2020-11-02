@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'pages/new_entry_page.dart';
+import 'pages/entry_management_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -62,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => NewEntryPage()),
+        MaterialPageRoute(builder: (context) => EntryManagementPage()),
       );
       //_counter++;
     });
