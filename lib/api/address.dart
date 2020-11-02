@@ -57,6 +57,8 @@ class CachedAddress {
 }
 
 Future<Address> getAddressOfLocation(double lat, double lon) async {
+  if (lat == null || lon == null) return null;
+
   final cachedEntry = _cache[{lat: lon}];
   if (cachedEntry != null &&
       cachedEntry.expiringDate <
@@ -80,7 +82,13 @@ Future<List<Address>> searchAddress(
   List<Address> addresses = List<Address>();
 
   final places = await Nominatim.searchByName(
-      street: street, postalCode: postCode, city: city, addressDetails: true);
+          street: street,
+          postalCode: postCode,
+          city: city,
+          addressDetails: true)
+      .catchError((e) => null);
+
+  if (places == null) return null;
 
   for (var place in places) {
     addresses

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong/latlong.dart';
 
-FlutterMap renderMap(BuildContext context, double lat, double lon) {
+Widget renderMap(BuildContext context, double lat, double lon) {
+  if (lat == null || lon == null) return Text("Keine Kartenansicht verfügbar.");
+
   return new FlutterMap(
     options: new MapOptions(
       interactive: false,

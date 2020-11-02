@@ -86,18 +86,23 @@ final query = ''
     'out qt;';
 
 Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
+  if (lat == null || lon == null) return null;
+
   final position = new LatLng(lat, lon);
 
   final cachedEntry = _cache[{lat: lon}];
   var jsonResponse;
 
-  if (cachedEntry != null && cachedEntry.expiringDate < DateTime.now().add(_ttl).millisecondsSinceEpoch) {
+  if (cachedEntry != null &&
+      cachedEntry.expiringDate <
+          DateTime.now().add(_ttl).millisecondsSinceEpoch) {
     jsonResponse = cachedEntry.pois;
   } else {
     final postBody = sprintf(query, [lat, lon]);
     final response = await http
         .post(url, body: postBody)
-        .timeout(new Duration(seconds: 10), onTimeout: null);
+        .timeout(new Duration(seconds: 10), onTimeout: null)
+        .catchError((e) => null);
 
     if (response == null || response.statusCode != 200) return null;
 

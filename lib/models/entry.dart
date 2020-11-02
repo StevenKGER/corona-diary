@@ -48,7 +48,7 @@ class Entry {
     };
 
     return addressArray
-        .where((element) => element.trim().length != 0)
+        .where((element) => element?.trim()?.length != 0)
         .join(", ");
   }
 }
