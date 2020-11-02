@@ -5,8 +5,11 @@ import 'package:location/location.dart';
 
 LocationData _oldLocation;
 int _timeOfNotification = DateTime.now().millisecondsSinceEpoch;
+bool _initialized = false;
 
 void startListener() {
+  if (_initialized || location == null) return;
+
   location.onLocationChanged.listen((LocationData currentLocation) {
     if (_oldLocation == null) {
       _oldLocation = currentLocation;
@@ -27,4 +30,6 @@ void startListener() {
       }
     }
   });
+
+  _initialized = true;
 }

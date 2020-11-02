@@ -1,5 +1,7 @@
 import 'dart:io';
 
+bool _initiated = false;
+
 class CustomHttpOverride extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext context) {
@@ -8,5 +10,8 @@ class CustomHttpOverride extends HttpOverrides {
 }
 
 void initHttpClient() {
+  if (_initiated) return;
+
   HttpOverrides.global = CustomHttpOverride();
+  _initiated = true;
 }
