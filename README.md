@@ -1,16 +1,16 @@
-# corona_diary
+# Corona-Tagebuch
 
-An applcation for contact tracking in case of a coronavirus infection
+This is an application providing a way to track your contacts for users using Android 8.0+.
 
-## Getting Started
+This project has been developed as part of the module "Software-Engineering I" at the Berlin School of Economics and Law (Hochschule für Wirtschaft und Recht Berlin) in 2020.
 
-This project is a starting point for a Flutter application.
+## Installation
+An .apk-file is available in the "Release" section.
 
-A few resources to get you started if this is your first Flutter project:
+In case, you want to compile the software on your own, run 
+```
+~$ flutter pub run build_runner build
+~$ flutter build apk
+```
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+in order to receive a Fat APK.
