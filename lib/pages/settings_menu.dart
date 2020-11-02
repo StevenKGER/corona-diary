@@ -1,5 +1,5 @@
-import 'package:corona_diary/models/settings.dart';
 import 'package:corona_diary/models/entries.dart';
+import 'package:corona_diary/models/settings.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +55,9 @@ class SettingsPageState extends State<SettingsPage> {
                       onPressed: () {
                         showAboutDialog(context: context, children: <Widget>[
                           Text("Made by Alp, Nika, Liadan and Steven with ♥ in"
-                              " Berlin"),
+                              " Berlin\n\nDas App-Icon entstammt der Wikimedia "
+                              "(Nutzer Yatko, Cornavirus_SVG_Vector_Image), "
+                              "veröffentlicht unter der CC BY-SA 4.0-Lizenz."),
                         ]);
                       }),
                 ]);
@@ -66,7 +68,7 @@ class SettingsPageState extends State<SettingsPage> {
 
 class DarkMode extends StatefulWidget {
   DarkMode({Key key, this.settings}) : super(key: key);
-  Settings settings;
+  final Settings settings;
 
   @override
   _DarkMode createState() => _DarkMode();
@@ -105,7 +107,7 @@ class _DarkMode extends State<DarkMode> {
 
 class AutomaticDeletion extends StatefulWidget {
   AutomaticDeletion({Key key, this.settings}) : super(key: key);
-  Settings settings;
+  final Settings settings;
 
   @override
   _AutomaticDeletion createState() => _AutomaticDeletion();
