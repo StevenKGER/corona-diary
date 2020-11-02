@@ -82,7 +82,7 @@ final query = ''
     'node[~"^(amenity|leisure)\$"~"^(restaurant|pub|place_of_worship|cafe|'
     'fast_food|bar|biergarten|cinema|nightclub|theatre|sports_centre|stadium|'
     'fitness_centre|water_park|dance|bowling_alley|sports_hall|escape_game)\$"]'
-    '(around:20,%f,%f);'
+    '(around:25,%f,%f);'
     'out qt;';
 
 Future<Map<POI, int>> getPOIsNearBy(double lat, double lon) async {
