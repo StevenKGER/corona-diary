@@ -1,6 +1,11 @@
 import 'package:corona_diary/api/map.dart';
+import 'package:corona_diary/main.dart';
 import 'package:corona_diary/models/entries.dart';
+import 'package:corona_diary/models/settings.dart';
+import 'package:corona_diary/pages/entry_management_page.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class OverviewPage extends StatefulWidget {
   OverviewPage({Key key, this.title}) : super(key: key);
@@ -16,14 +21,10 @@ class _OverviewPage extends State<OverviewPage> {
     super.initState();
   }
 
-  void setStateRemote(Function function) {
-    setState(function);
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Widget>>(
-      future: _generateOverview(context, this.setStateRemote),
+      future: _generateOverview(context),
       builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
         if (!snapshot.hasData)
           return Center(child: CircularProgressIndicator());
@@ -55,8 +56,9 @@ final _infoText = Center(
   ),
 ]));
 
-Future<List<Widget>> _generateOverview(
-    BuildContext context, Function stateCallback) async {
+Future<List<Widget>> _generateOverview(BuildContext context) async {
+  removeEntriesOlderThen((await getSettings()).daysUntilRemoval);
+
   List<Widget> widgets = [];
   Entries entries = await getAllEntries();
 
@@ -88,40 +90,39 @@ Future<List<Widget>> _generateOverview(
               child: RichText(
                 text: new TextSpan(
                   style: new TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
-                  ),
+                      fontSize: 20.0,
+                      color: DynamicTheme.of(context)
+                          .data
+                          .textTheme
+                          .bodyText1
+                          .color),
                   children: <TextSpan>[
                     new TextSpan(
                         text: ("\n${entry.name}"),
                         style: new TextStyle(
                             fontWeight: FontWeight.bold, fontSize: 25.0)),
-                    new TextSpan(text: ("\n${entry.toAddressString()}\n")),
+                    new TextSpan(
+                        text:
+                            ("\n${entry.latitude != null ? entry.toAddressString() : ""}\n")),
                     new TextSpan(
                         text: "Startzeit:\n",
-                        style: new TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )),
+                        style: new TextStyle(fontWeight: FontWeight.bold)),
                     new TextSpan(text: startDate),
                     new TextSpan(
-                        text: (entry.endTime != null ? "\nEndzeit:" : ""),
-                        style: new TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )),
+                        text: (entry.endTime != null ? "\nEndzeit:\n" : ""),
+                        style: new TextStyle(fontWeight: FontWeight.bold)),
                     new TextSpan(
                         text: (entry.endTime != null ? "$endDate" : "")),
                     new TextSpan(
                         text: ((entry.description ?? "").trim().isNotEmpty
                             ? "\nBeschreibung: \n"
                             : ""),
-                        style: new TextStyle(
-                          fontWeight: FontWeight.bold,
-                        )),
+                        style: new TextStyle(fontWeight: FontWeight.bold)),
                     new TextSpan(
                       text: ((entry.description ?? "").trim().isNotEmpty
                           ? "${entry.description}"
                           : ""),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -142,12 +143,21 @@ Future<List<Widget>> _generateOverview(
                       onPressed: () {
                         Navigator.of(context).pop();
                         removeEntryById(entry.id);
-                        stateCallback(() {});
+                        Fluttertoast.showToast(msg: "Eintrag gelöscht.");
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => MainPage()));
                       }),
                   FlatButton(
                       child: Text("Bearbeiten"),
                       onPressed: () {
                         Navigator.of(context).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EntryManagementPage(entry: entry)));
                       }),
                   FlatButton(
                       child: Text("Abbrechen"),
