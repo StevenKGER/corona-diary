@@ -44,7 +44,7 @@ class BasicDateTimeField extends StatelessWidget {
   var currentTime;
   var text;
 
-  BasicDateTimeField(bool showCurrentTime, String text) {
+  BasicDateTimeField(bool showCurrentTime, String text, this.currentTime) {
     if (showCurrentTime) {
       this.currentTime = DateTime.now();
       _startTime = currentTime;
@@ -421,60 +421,67 @@ class _EntryFormState extends State<EntryForm> {
                                                                     content: Text(
                                                                         "Ein Fehler ist aufgetreten. Der Eintrag kann zukünftig nicht in einer Karte dargestellt werden."));
                                                               });
-                                                        } else if (addresses.length == 0) {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext context) {
-                                                                return AlertDialog(
-                                                                    actions: <Widget>[
-                                                                      FlatButton(
-                                                                        onPressed: () {
-                                                                          Navigator.of(context).pop();
-                                                                          Navigator.of(context).pop();
-                                                                        },
-                                                                        child: Text("Ok"),
-                                                                      )
-                                                                    ],
-                                                                    content:
-                                                                        Text("Die eingegebene Adresse ist ungültig."));
-                                                              });
-                                                        } else if (addresses.length == 1) {
-                                                          _selectedPOI = null;
-                                                          _selectedAddress = addresses[0];
-                                                          _controllerAddress.text = _selectedAddress.toString();
-
-                                                          Navigator.of(context).pop();
-
-                                                          _controllerStreet.text = "";
-                                                          _controllerNumber.text = "";
-                                                          _controllerPostCode.text = "";
-                                                          _controllerCity.text = "";
-
-                                                          Navigator.of(context).pop();
                                                         } else {
-                                                          Navigator.of(context).pop();
+                                                          if (addresses.length == 0) {
+                                                            showDialog(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return AlertDialog(
+                                                                      actions: <Widget>[
+                                                                        FlatButton(
+                                                                          onPressed: () {
+                                                                            Navigator.of(context).pop();
+                                                                            Navigator.of(context).pop();
+                                                                          },
+                                                                          child: Text("Ok"),
+                                                                        )
+                                                                      ],
+                                                                      content: Text(
+                                                                          "Die eingegebene Adresse ist ungültig."));
+                                                                });
+                                                          } else if (addresses.length == 1) {
+                                                            _selectedPOI = null;
+                                                            _selectedAddress = addresses[0];
+                                                            _controllerAddress.text = _selectedAddress.toString();
 
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (BuildContext context) {
-                                                                return SimpleDialog(children: [
-                                                                  ListView.builder(
-                                                                      scrollDirection: Axis.vertical,
-                                                                      shrinkWrap: true,
-                                                                      itemCount: addresses.length,
-                                                                      itemBuilder: (BuildContext context, int index) {
-                                                                        return GestureDetector(
-                                                                            onTap: () {
-                                                                              _selectedAddress = addresses[index];
-                                                                              _selectedPOI = null;
-                                                                              _controllerAddress.text =
-                                                                                  _selectedAddress.toString();
-                                                                              Navigator.of(context).pop();
-                                                                            },
-                                                                            child: Text("$_selectedAddress\n"));
-                                                                      })
-                                                                ]);
-                                                              });
+                                                            Navigator.of(context).pop();
+
+                                                            _controllerStreet.text = "";
+                                                            _controllerNumber.text = "";
+                                                            _controllerPostCode.text = "";
+                                                            _controllerCity.text = "";
+
+                                                            Navigator.of(context).pop();
+                                                          } else {
+                                                            Navigator.of(context).pop();
+
+                                                            showDialog(
+                                                                context: context,
+                                                                builder: (BuildContext context) {
+                                                                  return SimpleDialog(children: [
+                                                                    Container(
+                                                                      width: MediaQuery.of(context).size.width * 0.8,
+                                                                      child: ListView.builder(
+                                                                          scrollDirection: Axis.vertical,
+                                                                          shrinkWrap: true,
+                                                                          itemCount: addresses.length,
+                                                                          itemBuilder:
+                                                                              (BuildContext context, int index) {
+                                                                            return GestureDetector(
+                                                                                onTap: () {
+                                                                                  _selectedAddress = addresses[index];
+                                                                                  _selectedPOI = null;
+                                                                                  _controllerAddress.text =
+                                                                                      _selectedAddress.toString();
+                                                                                  Navigator.of(context).pop();
+                                                                                  Navigator.of(context).pop();
+                                                                                },
+                                                                                child: Text("${addresses[index]}\n"));
+                                                                          }),
+                                                                    )
+                                                                  ]);
+                                                                });
+                                                          }
                                                         }
                                                       }
                                                     },
@@ -495,8 +502,8 @@ class _EntryFormState extends State<EntryForm> {
                     );
                   })
               : Text("")),
-          BasicDateTimeField(true, "Startzeit"),
-          BasicDateTimeField(false, "Endzeit"),
+          BasicDateTimeField(widget.entry == null, "Startzeit", _startTime),
+          BasicDateTimeField(false, "Endzeit", null),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextFormField(
