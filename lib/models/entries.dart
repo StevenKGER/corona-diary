@@ -114,7 +114,7 @@ void removeEntriesOlderThen(int days) async {
     if (entryDate.millisecondsSinceEpoch > currentDate.millisecondsSinceEpoch)
       return true;
 
-    return entryDate.difference(currentDate).inDays < days;
+    return entryDate.difference(currentDate).abs().inDays < days;
   }).forEach((element) => tempList.add(element));
 
   entries.entryList = tempList;

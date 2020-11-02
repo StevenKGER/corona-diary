@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:corona_diary/api/map.dart';
 import 'package:corona_diary/main.dart';
 import 'package:corona_diary/models/entries.dart';
@@ -6,6 +8,9 @@ import 'package:corona_diary/pages/entry_management_page.dart';
 import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
+
+DateFormat _dateFormat = DateFormat("dd.MM.yyyy   HH:mm");
 
 class OverviewPage extends StatefulWidget {
   OverviewPage({Key key, this.title}) : super(key: key);
@@ -59,20 +64,20 @@ final _infoText = Center(
 Future<List<Widget>> _generateOverview(BuildContext context) async {
   removeEntriesOlderThen((await getSettings()).daysUntilRemoval);
 
+  sleep(new Duration(milliseconds: 250));
+
   List<Widget> widgets = [];
   Entries entries = await getAllEntries();
 
   entries.entryList.forEach((entry) {
     final startDateTime = DateTime.fromMillisecondsSinceEpoch(entry.startTime);
-    final startDate =
-        "${startDateTime.day}.${startDateTime.month}.${startDateTime.year}   ${startDateTime.hour}:${startDateTime.minute}";
+    final startDate = _dateFormat.format(startDateTime);
 
     final endDateTime = (entry.endTime != null
         ? DateTime.fromMillisecondsSinceEpoch(entry.endTime)
         : null);
-    final endDate = (endDateTime != null
-        ? "${endDateTime.day}.${endDateTime.month}.${endDateTime.year}   ${endDateTime.hour}:${endDateTime.minute}"
-        : null);
+    final endDate =
+        (endDateTime != null ? _dateFormat.format(endDateTime) : null);
 
     final container = GestureDetector(
       child: Container(
