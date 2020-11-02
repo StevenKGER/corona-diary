@@ -1,4 +1,7 @@
+import 'package:corona_diary/listener/gps.dart';
+import 'package:corona_diary/pages/entry_management_page.dart';
 import 'package:corona_diary/pages/overview_page.dart';
+import 'package:corona_diary/util/http_override.dart';
 import 'package:corona_diary/util/location.dart';
 import 'package:corona_diary/util/notification.dart';
 import 'package:corona_diary/util/store.dart';
@@ -25,15 +28,14 @@ class CoronaDiaryApp extends StatelessWidget {
           return new MaterialApp(
             title: 'Corona-Tagebuch',
             theme: theme,
-            home: new MainPage(title: 'Corona-Tagebuch'),
+            home: new MainPage(),
           );
         });
   }
 }
 
 class MainPage extends StatefulWidget {
-  MainPage({Key key, this.title}) : super(key: key);
-  final String title;
+  MainPage({Key key}) : super(key: key);
 
   @override
   _MainPageState createState() => _MainPageState();
@@ -47,13 +49,15 @@ class _MainPageState extends State<MainPage> {
     initJsonStore();
     initLocation();
     initNotifications();
+    initHttpClient();
+    startListener();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text("Corona-Tagebuch"),
         actions: <Widget>[
           Padding(
               padding: EdgeInsets.only(right: 20.0),
@@ -71,7 +75,8 @@ class _MainPageState extends State<MainPage> {
       ),
       body: OverviewPage(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => EntryManagementPage())),
         tooltip: 'Eintrag hinzufügen',
         child: Icon(Icons.add),
       ),
